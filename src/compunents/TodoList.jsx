@@ -1,48 +1,78 @@
-import React from 'react'
-import Todoitem from './Todoitem';
-import './TodoList.css'
-import { useState } from 'react';
+import React, { useState, useReducer } from 'react'
 
-const TodoList = ({ todos, onUpdate, onDelete }) => {
+const reducer = (state, active) => {
+    switch (active.type) {
+        case 'add':
+            return [
+                ...state, {
+                    id: Date.now(),
+                    text: active.text,
+                    completed: false
+                }
+            ]
 
-    const [search, setSearch] = useState('')
-    const onChangeSearch = (e) => {
-        setSearch(e.target.value)
+        case 'toggle':
+            return state.map((todo) =>
+                todo.id === active.id ? {
+                    ...todo,
+                    completed: !todo.completed
+                } : todo
+            )
+
+        case 'delete':
+            return state.filter((todo) => todo.id !== active.id)
+
+        default:
+            return state
     }
+}
 
-    const getFilteredData = () => {
-        if (search === '') {
-            return todos
-        }
-        return todos.filter((todo) =>
-            todo.content
-                .toLowerCase()
-                .includes(search.toLowerCase())
-        )
+
+
+
+const TodoList = () => {
+
+    const [todos, dispatch] = useReducer(reducer, [])
+    const [text, setText] = useState('')
+
+    const handleAdd = () => {
+        if (!text.trim()) return
+
+        dispatch({ type: 'add', text })
+        setText('')
     }
-
-    const filteredTodes = getFilteredData()
 
     return (
-        <div className='TodoList'>
-            <h4>Todo List 🌱</h4>
+        <div>
+            <h2>TodoList</h2>
             <input
                 type="text"
-                value={search}
-                onChange={onChangeSearch}
-                placeholder='검색어 입력' />
-            <div className="todo_wrapper">
-                {filteredTodes.map((todo) => (
-                    <Todoitem
-                        {...todo}
-                        key={todo.id}
-                        onUpdate={onUpdate}
-                        onDlete={onDelete}
-                    />
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleAdd()
+                }}
+                placeholder='할일추가' />
+            <button onClick={handleAdd}>추가</button>
+            <ul>
+                {todos.map((todo) => (
+                    <li key={todo.id}>
+                        <div onClick={() => dispatch({
+                            type:'toggle',
+                            id:todo.id
+                            })}
+                            className={todo.completed? 'completed':''}
+                            >
+                        {todo.text}
+                        </div>
+                        <button onClick={() => dispatch({
+                            type:'delete',
+                            id:todo.id})}>삭제</button>
+                    </li>
                 ))}
-            </div>
+            </ul>
         </div>
-    );
+    )
 }
 
 export default TodoList
