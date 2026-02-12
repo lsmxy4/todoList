@@ -8,21 +8,28 @@ const Todoitem = ({ id, isDone, content, date, onUpdate, onDelete }) => {
   };
 
   const onClickDeleteButton = () => {
-    onDelete(id); 
+    onDelete(id);
   };
 
   return (
     <div className="TodoItem">
       <input
-        onChange={onChangeCheckbox}
-        readOnly
-        checked={isDone}
         type="checkbox"
+        checked={isDone}
+        onChange={() => onUpdate(id)}
       />
-      <div className="content">{content}</div>
-      <div className="date">{new Date(date).toLocaleDateString()}</div>
-      <button onClick={onClickDeleteButton}>삭제</button>
+
+      <div className={`content ${isDone ? 'done' : ''}`}>
+        {content}
+      </div>
+
+      <div className="date">
+        {new Date(date).toLocaleDateString()}
+      </div>
+
+      <button onClick={() => onDelete(id)}>삭제</button>
     </div>
+
   );
 };
 
