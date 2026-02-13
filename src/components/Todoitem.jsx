@@ -1,5 +1,5 @@
 import React from 'react'
-import "./TodoItem.css"
+import "./Todoitem.css"
 import { useTodoStore } from '../context/TodoContext'
 const TodoItem = ({
   id,
